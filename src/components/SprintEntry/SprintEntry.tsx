@@ -12,17 +12,17 @@ interface ISprintProps {
 export const SprintEntry = ({ sprint }: ISprintProps) => {
   const [openModal, setOpenModal] = useState(false);
   const [openModalSee, setOpenModalSee] = useState(false);
-  const setSprintActivo = sprintStore((state) => state.setSprintActiva)
+  const setSprintActivo = sprintStore((state) => state.setSprintActivo)
   const { deleteSprint } = useSprints()
 
   const handleOpenModalSee = () => {
-    setSprintActivo(sprint)
+    setSprintActivo(sprint._id)
     setOpenModalSee(true)
     setOpenModal(true)
   }
 
   const handleOpenModalEntry = () => {
-    setSprintActivo(sprint)
+    setSprintActivo(sprint._id)
     setOpenModal(true)
   }
 
@@ -33,12 +33,12 @@ export const SprintEntry = ({ sprint }: ISprintProps) => {
   }
 
   const handleDelete = () => {
-    deleteSprint(sprint.id!);
+    deleteSprint(sprint._id!);
   };
 
 
   return (
-    <div className={styles.mainDiv} onClick={() => setSprintActivo(sprint)}>
+    <div className={styles.mainDiv} onClick={() => setSprintActivo(sprint._id)}>
       <h1>{sprint.nombre}</h1>
       <div className={styles.flexDiv}>
         <div>

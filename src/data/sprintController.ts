@@ -1,68 +1,69 @@
-import axios from "axios"
-import { ISprint } from "../types/ISprint"
-import { putSprintBar } from "../http/sprintsBar";
+import axios from "axios";
+import { ISprint } from "../types/ISprint";
 
-export const getSprintsController = async():Promise<ISprint[]| undefined> => {
-    try{
-        const response=await axios.get<{sprints:ISprint[]}>(import.meta.env.VITE_SPRINTS_ENDPOINT);
-        return response.data.sprints;
-    }catch(err){
-        console.log("Hubo un problema al obtener los sprints", err)
+// Cliente HTTP con configuración base
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL || "",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+export const getSprintsController = async (): Promise<ISprint[] | undefined> => {
+  try {
+    // La respuesta ya es directamente un array de sprints
+    const response = await api.get<ISprint[]>(import.meta.env.VITE_SPRINTS_ENDPOINT);
+    return response.data;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      console.error(`Error al obtener sprints - ${err.response?.status}: ${err.message}`);
+    } else {
+      console.error("Error desconocido al obtener sprints:", err);
     }
-}
-
-//Crear Sprint
-export const createSprintController = async (sprintNuevo: ISprint) => {
-    try {
-        const sprintsBd = await getSprintsController();
-
-        if (sprintsBd) {
-            await putSprintBar([...sprintsBd, sprintNuevo]);
-        } else {
-            await putSprintBar([sprintNuevo]);
-        }
-
-        return sprintNuevo;
-    } catch (error) {
-        console.log("Error en createTareaController", error);
-    }
+    return undefined;
+  }
 };
 
-// Actualizar sprint
-export const updateSprintController = async (
-    sprintActualizado: ISprint
-) => {
-    try {
-        const sprintsBd = await getSprintsController();
-
-        if (sprintsBd) {
-            const result = sprintsBd.map((sprintBd) =>
-                sprintBd.id === sprintActualizado.id
-                    ? { ...sprintBd, ...sprintActualizado }
-                    : sprintBd
-            );
-
-            await putSprintBar(result);
-        }
-        return sprintActualizado; 
-    } catch (error) {
-        console.log("Error en updateSprintController", error);
-    }
+// Función para obtener un sprint específico por ID
+export const getSprintByIdController = async (id: string): Promise<ISprint | undefined> => {
+  try {
+    const response = await api.get<ISprint>(`${import.meta.env.VITE_SPRINTS_ENDPOINT}/${id}`);
+    return response.data;
+  } catch (err) {
+    console.error(`Error al obtener el sprint ${id}:`, err);
+    return undefined;
+  }
 };
 
-//Eliminar Sprint
-export const deleteSprintController = async (idSprintAEliminar: string) => {
-    try {
-        const sprintsDb = await getSprintsController();
+// Función para crear un nuevo sprint
+export const createSprintController = async (sprint: Omit<ISprint, '_id'>): Promise<ISprint | undefined> => {
+  try {
+    const response = await api.post<ISprint>(import.meta.env.VITE_SPRINTS_ENDPOINT, sprint);
+    return response.data;
+  } catch (err) {
+    console.error("Error al crear el sprint:", err);
+    return undefined;
+  }
+};
 
-        if (sprintsDb) {
-            const result = sprintsDb.filter(
-                (sprintDb) => sprintDb.id !== idSprintAEliminar
-            );
+// Función para actualizar un sprint existente
+export const updateSprintController = async (id: string, sprint: Partial<ISprint>): Promise<ISprint | undefined> => {
+  try {
+    const response = await api.put<ISprint>(`${import.meta.env.VITE_SPRINTS_ENDPOINT}/${id}`, sprint);
+    return response.data;
+  } catch (err) {
+    console.error(`Error al actualizar el sprint ${id}:`, err);
+    return undefined;
+  }
+};
 
-            await putSprintBar(result);
-        }
-    } catch (error) {
-        console.log("Error en deleteSprintController", error);
-    }
+// Función para eliminar un sprint
+export const deleteSprintController = async (id: string): Promise<boolean> => {
+  try {
+    await api.delete(`${import.meta.env.VITE_SPRINTS_ENDPOINT}/${id}`);
+    return true;
+  } catch (err) {
+    console.error(`Error al eliminar el sprint ${id}:`, err);
+    return false;
+  }
 };

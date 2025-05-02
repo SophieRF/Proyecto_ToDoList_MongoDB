@@ -1,7 +1,7 @@
 export interface ITarea {
-    id?: string
-    titulo: string
-    descripcion: string
-    estado: string
-    fechaLimite: string
-}
+    sprint: string | null;
+    titulo: string;
+    descripcion: string;
+    estado: "Por hacer" | "En progreso" | "Terminada";
+    fechaLimite: string;
+  }

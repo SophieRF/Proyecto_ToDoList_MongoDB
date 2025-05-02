@@ -6,7 +6,7 @@ import { sprintStore } from "../../../store/sprintStore";
 
 export const SprintList = () => {
     const { getSprints, sprints } = useSprints()
-    const activeSprint = sprintStore((state) => state.sprintActiva);
+    const activeSprint = sprintStore((state) => state.sprintActivo);
 
     useEffect(() => {
         getSprints()

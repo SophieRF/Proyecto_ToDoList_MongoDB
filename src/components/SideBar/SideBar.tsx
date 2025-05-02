@@ -9,7 +9,7 @@ import { ModalSprints } from "../ui/ModalSprints/ModalSprints";
 export const SideBar = () => {
   const navigate = useNavigate()
   const [openModal, setOpenModal] = useState(false);
-  const setSprintActivo = sprintStore((state) => state.setSprintActiva)
+  const setSprintActivo = sprintStore((state) => state.setSprintActivo)
 
   const handleOpenModal = () => {
     setSprintActivo(null)
